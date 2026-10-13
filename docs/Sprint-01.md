@@ -1,80 +1,67 @@
-\# TechSupport - Sprint 1
+# TechSupport - Sprint 1
 
-
-
-\## Objetivo
+## Objetivo
 
 Preparar el Product Backlog inicial, el diseño preliminar
 
 y el entorno técnico del proyecto.
 
+## Tecnologías verificadas
 
+- PHP 8.4.26
 
-\## Tecnologías verificadas
+- Laravel 13.35.0
 
-\- PHP 8.4.26
+- Composer 2.9.3
 
-\- Laravel 13.35.0
+- MySQL Community Server 8.0.46
 
-\- Composer 2.9.3
+- Bootstrap 5.3.8
 
-\- MySQL Community Server 8.0.46
+- Popper 2.11.8
 
-\- Bootstrap 5.3.8
+- Node.js 22.15.0
 
-\- Popper 2.11.8
+- npm 10.9.2
 
-\- Node.js 22.15.0
+- Vite 7.3.7
 
-\- npm 10.9.2
+- Git 2.52.0
 
-\- Vite 7.3.7
+## Preparación realizada
 
-\- Git 2.52.0
+- Proyecto Laravel creado con Composer.
 
+- Base de datos techsupport creada en MySQL.
 
+- Conexión Laravel-MySQL comprobada.
 
-\## Preparación realizada
+- Tres migraciones iniciales ejecutadas correctamente.
 
-\- Proyecto Laravel creado con Composer.
+- Nueve tablas iniciales generadas.
 
-\- Base de datos techsupport creada en MySQL.
+- Bootstrap integrado mediante Vite.
 
-\- Conexión Laravel-MySQL comprobada.
+- Compilación de recursos frontend completada.
 
-\- Tres migraciones iniciales ejecutadas correctamente.
+- Servidor local Laravel comprobado en el navegador.
 
-\- Nueve tablas iniciales generadas.
+- Repositorio GitHub creado y rama main publicada.
 
-\- Bootstrap integrado mediante Vite.
-
-\- Compilación de recursos frontend completada.
-
-\- Servidor local Laravel comprobado en el navegador.
-
-\- Repositorio GitHub creado y rama main publicada.
-
-
-
-\## Control de versiones
+## Control de versiones
 
 Rama principal: main.
 
 Ramas de trabajo: feature/, fix/ y docs/.
 
-
-
-\## Seguridad
+## Seguridad
 
 Las credenciales locales permanecen en .env y no deben
 
 publicarse en GitHub.
 
-
-
-\## Alcance
+## Alcance
 
 El Sprint 1 prepara el proyecto. Los módulos funcionales
 
 se desarrollarán en los Sprints posteriores.
-
