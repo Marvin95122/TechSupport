@@ -1,70 +1,90 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Panel - TechSupport</title>
-    @vite('resources/js/app.js')
-</head>
-<body class="bg-light">
+@extends('layouts.app')
 
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-        <span class="navbar-brand fw-bold">TechSupport</span>
+@section('title', 'Panel principal')
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="btn btn-outline-light btn-sm">
-                Cerrar sesión
-            </button>
-        </form>
+@section('content')
+    <div class="mb-4">
+        <p class="text-uppercase fw-semibold text-secondary small mb-1">Resumen de trabajo</p>
+        <h1 class="ts-page-heading">Bienvenido, {{ auth()->user()->name }}</h1>
+        <p class="text-secondary mb-0">Accede a las funciones disponibles para tu perfil.</p>
     </div>
-</nav>
 
-<main class="container py-5">
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-
-            <h1 class="h3 mb-3">Panel principal</h1>
-
-            <p>
-                Bienvenido,
-                <strong>{{ auth()->user()->name }}</strong>.
-            </p>
-
-            <p class="mb-2">
-                <strong>Correo:</strong>
-                {{ auth()->user()->email }}
-            </p>
-
-            <p class="mb-3">
-                <strong>Rol:</strong>
-                @if (auth()->user()->role === 'administrador')
-                    Administrador
-                @elseif (auth()->user()->role === 'tecnico')
-                    Técnico
-                @elseif (auth()->user()->role === 'solicitante')
-                    Solicitante
-                @else
-                    Sin rol definido
-                @endif
-                @if (auth()->user()->role === 'administrador')
-                    <div class="mt-3">
-                        <a href="{{ route('admin.users.index') }}"
-                        class="btn btn-primary">
-                            Administrar usuarios
-                        </a>
-                    </div>
-                @endif
-            </p>
-
-            <div class="alert alert-info">
-                Tu sesión está autenticada. Las opciones disponibles dependen de tu rol.
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="ts-stat-card">
+                <span class="ts-stat-label">Pendientes</span>
+                <strong class="ts-stat-value">—</strong>
+                <small>Disponible en Sprint 7</small>
             </div>
-
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="ts-stat-card">
+                <span class="ts-stat-label">Asignados</span>
+                <strong class="ts-stat-value">—</strong>
+                <small>Disponible en Sprint 5</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="ts-stat-card">
+                <span class="ts-stat-label">En proceso</span>
+                <strong class="ts-stat-value">—</strong>
+                <small>Disponible en Sprint 7</small>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="ts-stat-card">
+                <span class="ts-stat-label">Resueltos</span>
+                <strong class="ts-stat-value">—</strong>
+                <small>Disponible en Sprint 7</small>
+            </div>
         </div>
     </div>
-</main>
 
-</body>
-</html>
+    <section class="ts-panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">Accesos rápidos</h2>
+                <p class="small text-secondary mb-0">La navegación se habilitará conforme se incorporen los módulos.</p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            @if (auth()->user()->role === 'administrador')
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <h3 class="h6 fw-bold">Administración de usuarios</h3>
+                        <p class="text-secondary small">Registrar, editar, activar y desactivar cuentas y gestionar roles.</p>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir usuarios</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <h3 class="h6 fw-bold">Equipos tecnológicos</h3>
+                        <p class="text-secondary small">Registro, consulta, edición y baja lógica de equipos.</p>
+                        <span class="badge text-bg-secondary mt-auto align-self-start">En desarrollo · Sprint 3</span>
+                    </div>
+                </div>
+            @elseif (auth()->user()->role === 'tecnico')
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <h3 class="h6 fw-bold">Mis asignaciones</h3>
+                        <p class="text-secondary small">Consulta y seguimiento de tickets asignados.</p>
+                        <span class="badge text-bg-secondary mt-auto align-self-start">Disponible en Sprint 5</span>
+                    </div>
+                </div>
+            @elseif (auth()->user()->role === 'solicitante')
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <h3 class="h6 fw-bold">Nueva solicitud</h3>
+                        <p class="text-secondary small">Registro de incidencias y consulta de solicitudes personales.</p>
+                        <span class="badge text-bg-secondary mt-auto align-self-start">Disponible en Sprint 4</span>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+        <div class="alert alert-light border mt-4 mb-0 small" role="note">
+            Los apartados en desarrollo no son enlaces. Sus funciones se habilitarán después de implementar y comprobar los permisos y las operaciones correspondientes.
+        </div>
+    </section>
+@endsection

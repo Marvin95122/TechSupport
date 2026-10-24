@@ -1,0 +1,78 @@
+/* TechSupport – Sprint 3, Checkpoint A1
+   Capa de contraste sobre techsupport.css. No sustituye Bootstrap. */
+:root {
+    --ts-navy: #172c45;
+    --ts-navy-hover: #294766;
+    --ts-bg: #f2f5f9;
+    --ts-ink: #1c3048;
+    --ts-outline: #d3deeb;
+    --ts-primary: #1f65c9;
+}
+
+.ts-body {
+    background-color: var(--ts-bg);
+    color: var(--ts-ink);
+    color-scheme: light;
+}
+
+/* offcanvas-lg en Bootstrap puede transparentar el fondo en escritorio;
+   reforzamos también la variable que usa Bootstrap para el offcanvas. */
+.ts-sidebar.offcanvas-lg,
+.ts-sidebar.offcanvas,
+.ts-sidebar.offcanvas-start,
+.ts-sidebar .offcanvas-body,
+.ts-sidebar .offcanvas-header,
+.ts-sidebar .ts-sidebar-inner {
+    --bs-offcanvas-bg: var(--ts-navy);
+    --bs-offcanvas-color: #f8fafc;
+    background-color: var(--ts-navy) !important;
+    color: #f8fafc !important;
+}
+.ts-sidebar .ts-brand-name,
+.ts-sidebar .ts-profile strong,
+.ts-sidebar .ts-logout { color: #ffffff !important; }
+.ts-sidebar .ts-brand-subtitle,
+.ts-sidebar .ts-profile .small { color: #d8e5f2 !important; }
+.ts-sidebar .ts-profile { border-bottom-color: #4b6380; }
+.ts-sidebar .ts-nav-heading { color: #aac6e7 !important; }
+.ts-sidebar .ts-profile-avatar { background: #386a9d; color: white; }
+.ts-sidebar .ts-nav-link:not(.ts-nav-upcoming) {
+    color: #edf5ff !important;
+}
+.ts-sidebar a.ts-nav-link:hover,
+.ts-sidebar a.ts-nav-link:focus-visible { background: var(--ts-navy-hover); color: #ffffff !important; }
+.ts-sidebar .ts-nav-link.is-active { background: #2b6095; color: #fff !important; }
+.ts-sidebar .ts-nav-upcoming,
+.ts-sidebar .ts-nav-upcoming small { color: #c2d0e2 !important; opacity: 1; }
+.ts-sidebar .ts-logout { border-color: #829bb8; }
+.ts-sidebar .ts-logout:hover,
+.ts-sidebar .ts-logout:focus-visible { background: #2d4b6b; }
+.ts-sidebar .btn-close:focus-visible,
+.ts-sidebar a:focus-visible,
+.ts-sidebar button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.ts-topbar { background: #fff; border-bottom-color: var(--ts-outline); }
+.ts-topbar strong { color: #152e4b; }
+.ts-page-heading { color: #193754; }
+.ts-stat-card,
+.ts-panel,
+.ts-access-card,
+.ts-module-card { border: 1px solid var(--ts-outline); background: #fff; }
+.ts-stat-label { color: #183653; }
+.ts-stat-value { color: #193754; }
+.ts-content .btn-primary { --bs-btn-bg: var(--ts-primary); --bs-btn-border-color: var(--ts-primary); --bs-btn-hover-bg: #184f9d; --bs-btn-hover-border-color: #184f9d; }
+.ts-content .btn-outline-primary { --bs-btn-color: var(--ts-primary); --bs-btn-border-color: var(--ts-primary); --bs-btn-hover-bg: var(--ts-primary); --bs-btn-hover-border-color: var(--ts-primary); }
+.ts-content .table thead th { background: #e8f0fb; color: #1a3653; font-size: .87rem; border-bottom: 1px solid #bfd1e8; }
+.ts-content .table tbody td { color: #263d56; }
+.ts-module-card { border-radius: 14px; box-shadow: 0 5px 15px rgb(20 52 86 / 4%); padding: 25px; }
+.ts-module-title { font-weight: 750; color: #193754; }
+.ts-input-caption { color: #62758c; }
+.ts-content .form-control:focus,
+.ts-content .form-select:focus { border-color: #5083c5; box-shadow: 0 0 0 .2rem rgb(31 101 201 / 13%); }
+.ts-content .table-responsive { border: 1px solid #dce5ef; border-radius: 9px; }
+.ts-content .table { margin-bottom: 0; }
+.ts-content .alert { border-radius: 10px; }
+
+@media (max-width: 991.98px) {
+    .ts-sidebar.offcanvas-lg { width: min(290px, 88vw) !important; }
+}
