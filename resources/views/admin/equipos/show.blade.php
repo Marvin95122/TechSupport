@@ -9,7 +9,12 @@
             <h1 class="ts-page-heading">Ficha técnica: {{ $equipo->codigo }}</h1>
             <p class="text-secondary mb-0">Información registrada del recurso tecnológico.</p>
         </div>
-        <a href="{{ route('admin.equipos.index') }}" class="btn btn-outline-secondary">Volver al listado</a>
+        <div class="d-flex flex-wrap gap-2">
+            @if ($equipo->activo)
+                <a href="{{ route('admin.equipos.edit', $equipo) }}" class="btn btn-primary">Editar equipo</a>
+            @endif
+            <a href="{{ route('admin.equipos.index') }}" class="btn btn-outline-secondary">Volver al listado</a>
+        </div>
     </div>
 
     @if (session('status'))
@@ -38,6 +43,19 @@
             <dt class="col-sm-4 py-2">Área</dt><dd class="col-sm-8 py-2">{{ $equipo->area?->nombre ?? 'Sin área asignada' }}</dd>
             <dt class="col-sm-4 py-2">Responsable</dt><dd class="col-sm-8 py-2">{{ $equipo->responsable?->name ?? 'Sin responsable asignado' }}</dd>
         </dl>
-        <p class="text-secondary small mt-4 mb-0">La edición y la baja lógica estarán disponibles en el Checkpoint C2. El registro conservará su identificador para los futuros tickets.</p>
+        @if ($equipo->activo)
+            <div class="border-top pt-3 mt-3">
+                <h3 class="h6">Desactivación de equipo</h3>
+                <p class="text-secondary small">La baja es lógica: el equipo dejará de aparecer en el inventario activo, pero sus datos e identificador permanecerán guardados para el historial.</p>
+                <form method="POST" action="{{ route('admin.equipos.deactivate', $equipo) }}"
+                      onsubmit="return confirm('¿Confirmas la desactivación del equipo? No se eliminará su registro.');">
+                    @csrf
+                    @method('PATCH')
+                    <button class="btn btn-outline-danger" type="submit">Desactivar equipo</button>
+                </form>
+            </div>
+        @else
+            <div class="alert alert-secondary mt-3 mb-0">Este equipo se encuentra inactivo. Su registro se conserva para trazabilidad y no está disponible para edición.</div>
+        @endif
     </section>
 @endsection

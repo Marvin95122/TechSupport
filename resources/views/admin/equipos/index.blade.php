@@ -54,7 +54,9 @@
                                 @endif
                             </td>
                             <td>{{ $equipo->area?->nombre ?? 'Sin área' }}</td>
-                            <td><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.equipos.show', $equipo) }}">Ver ficha</a></td>
+                            <td><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.equipos.show', $equipo) }}">Ver ficha</a>
+                                <a class="btn btn-sm btn-outline-secondary ms-1" href="{{ route('admin.equipos.edit', $equipo) }}">Editar</a>
+                            </td>
                         </tr>
                     @empty
                         <tr><td colspan="6" class="text-center text-secondary py-4">No hay equipos activos que coincidan con la búsqueda.</td></tr>
@@ -66,6 +68,6 @@
         @if ($equipos->hasPages())
             <div class="mt-3">{{ $equipos->links('pagination::bootstrap-5') }}</div>
         @endif
-        <p class="text-secondary small mt-3 mb-0">Se muestran los equipos activos. La edición y la baja lógica se incorporarán en el Checkpoint C2.</p>
+        <p class="text-secondary small mt-3 mb-0">Se muestran únicamente los equipos activos. Los desactivados permanecen en la base de datos para conservar su historial.</p>
     </section>
 @endsection

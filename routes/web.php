@@ -80,3 +80,12 @@ Route::middleware(['auth', 'active', 'role:administrador'])
         Route::get('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'show'])->name('equipos.show');
         Route::post('/areas', [\App\Http\Controllers\Admin\EquipoController::class, 'storeArea'])->name('areas.store');
     });
+// Sprint 3 / Checkpoint C2: edición y baja lógica de equipos.
+Route::middleware(['auth', 'active', 'role:administrador'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function (): void {
+        Route::get('/equipos/{equipo}/editar', [\App\Http\Controllers\Admin\EquipoController::class, 'edit'])->name('equipos.edit');
+        Route::put('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'update'])->name('equipos.update');
+        Route::patch('/equipos/{equipo}/desactivar', [\App\Http\Controllers\Admin\EquipoController::class, 'deactivate'])->name('equipos.deactivate');
+    });
