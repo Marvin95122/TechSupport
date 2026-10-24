@@ -68,3 +68,15 @@ Route::middleware(['auth', 'active'])->group(function (): void {
             ])->name('users.toggle-status');
         });
 });
+
+// Sprint 3 / Checkpoint C1: registro y consulta de equipos.
+Route::middleware(['auth', 'active', 'role:administrador'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function (): void {
+        Route::get('/equipos', [\App\Http\Controllers\Admin\EquipoController::class, 'index'])->name('equipos.index');
+        Route::get('/equipos/crear', [\App\Http\Controllers\Admin\EquipoController::class, 'create'])->name('equipos.create');
+        Route::post('/equipos', [\App\Http\Controllers\Admin\EquipoController::class, 'store'])->name('equipos.store');
+        Route::get('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'show'])->name('equipos.show');
+        Route::post('/areas', [\App\Http\Controllers\Admin\EquipoController::class, 'storeArea'])->name('areas.store');
+    });

@@ -53,7 +53,11 @@
                            @if(request()->routeIs('admin.users.*')) aria-current="page" @endif>
                             <span>Usuarios</span>
                         </a>
-                        <span class="ts-nav-link ts-nav-upcoming"><span>Equipos</span><small>En desarrollo</small></span>
+                        <a href="{{ route('admin.equipos.index') }}"
+                           class="ts-nav-link {{ request()->routeIs('admin.equipos.*') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('admin.equipos.*')) aria-current="page" @endif>
+                            <span>Equipos</span>
+                        </a>
                         <span class="ts-nav-link ts-nav-upcoming"><span>Tickets</span><small>Sprint 4</small></span>
                         <span class="ts-nav-link ts-nav-upcoming"><span>Historial</span><small>Sprint 6</small></span>
                         <span class="ts-nav-link ts-nav-upcoming"><span>Consultas</span><small>Sprint 7</small></span>
