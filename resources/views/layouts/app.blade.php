@@ -64,10 +64,12 @@
                             <svg class="ts-icon"><use href="#ts-icon-monitor"/></svg>
                             <span class="ts-nav-text">Equipos</span>
                         </a>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Tickets: Sprint 4">
+                        <a href="{{ route('tickets.index') }}" aria-label="Tickets registrados" title="Tickets registrados"
+                           class="ts-nav-link {{ request()->routeIs('tickets.index', 'tickets.show') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('tickets.index', 'tickets.show')) aria-current="page" @endif>
                             <svg class="ts-icon"><use href="#ts-icon-ticket"/></svg>
-                            <span class="ts-nav-text">Tickets</span><small class="ts-nav-meta">Sprint 4</small>
-                        </span>
+                            <span class="ts-nav-text">Tickets</span>
+                        </a>
                         <span class="ts-nav-link ts-nav-upcoming" title="Historial: Sprint 6">
                             <svg class="ts-icon"><use href="#ts-icon-history"/></svg>
                             <span class="ts-nav-text">Historial</span><small class="ts-nav-meta">Sprint 6</small>
@@ -90,14 +92,18 @@
                             <span class="ts-nav-text">Historial</span><small class="ts-nav-meta">Sprint 6</small>
                         </span>
                     @elseif ($currentRole === 'solicitante')
-                        <span class="ts-nav-link ts-nav-upcoming" title="Nueva solicitud: Sprint 4">
+                        <a href="{{ route('tickets.create') }}" aria-label="Nueva solicitud" title="Nueva solicitud"
+                           class="ts-nav-link {{ request()->routeIs('tickets.create') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('tickets.create')) aria-current="page" @endif>
                             <svg class="ts-icon"><use href="#ts-icon-ticket"/></svg>
-                            <span class="ts-nav-text">Nueva solicitud</span><small class="ts-nav-meta">Sprint 4</small>
-                        </span>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Mis tickets: Sprint 4">
+                            <span class="ts-nav-text">Nueva solicitud</span>
+                        </a>
+                        <a href="{{ route('tickets.index') }}" aria-label="Mis tickets" title="Mis tickets"
+                           class="ts-nav-link {{ request()->routeIs('tickets.index', 'tickets.show') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('tickets.index', 'tickets.show')) aria-current="page" @endif>
                             <svg class="ts-icon"><use href="#ts-icon-clipboard"/></svg>
-                            <span class="ts-nav-text">Mis tickets</span><small class="ts-nav-meta">Sprint 4</small>
-                        </span>
+                            <span class="ts-nav-text">Mis tickets</span>
+                        </a>
                     @endif
                 </nav>
 
