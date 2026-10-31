@@ -68,8 +68,8 @@
                     <div class="ts-access-card h-100">
                         <span class="ts-access-icon ts-access-icon--muted" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-ticket"/></svg></span>
                         <h3 class="h6 fw-bold">Solicitudes de soporte</h3>
-                        <p class="text-secondary small">Registro y clasificación de tickets de atención.</p>
-                        <span class="badge text-bg-secondary mt-auto align-self-start">Próximo · Sprint 4</span>
+                        <p class="text-secondary small">Consulta solicitudes registradas y revisa su detalle.</p>
+                        <a href="{{ route('tickets.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Ver tickets <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
                     </div>
                 </div>
             @elseif (auth()->user()->role === 'tecnico')
@@ -86,8 +86,16 @@
                     <div class="ts-access-card h-100">
                         <span class="ts-access-icon ts-access-icon--muted" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-ticket"/></svg></span>
                         <h3 class="h6 fw-bold">Nueva solicitud</h3>
-                        <p class="text-secondary small">Reporta incidencias y consulta tus solicitudes.</p>
-                        <span class="badge text-bg-secondary mt-auto align-self-start">Próximo · Sprint 4</span>
+                        <p class="text-secondary small">Registra incidencias y obtén un folio de seguimiento.</p>
+                        <a href="{{ route('tickets.create') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Registrar solicitud <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <span class="ts-access-icon" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-clipboard"/></svg></span>
+                        <h3 class="h6 fw-bold">Mis tickets</h3>
+                        <p class="text-secondary small">Consulta tus solicitudes, folios y estados.</p>
+                        <a href="{{ route('tickets.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir mis tickets <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
                     </div>
                 </div>
             @endif

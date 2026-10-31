@@ -89,3 +89,23 @@ Route::middleware(['auth', 'active', 'role:administrador'])
         Route::put('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'update'])->name('equipos.update');
         Route::patch('/equipos/{equipo}/desactivar', [\App\Http\Controllers\Admin\EquipoController::class, 'deactivate'])->name('equipos.deactivate');
     });
+
+// Sprint 4 / Checkpoint C1: alta de solicitudes. HU-09.
+Route::middleware(['auth', 'active', 'role:solicitante'])
+    ->group(function (): void {
+        Route::get('/tickets/crear', [\App\Http\Controllers\Tickets\TicketController::class, 'create'])
+            ->name('tickets.create');
+        Route::post('/tickets', [\App\Http\Controllers\Tickets\TicketController::class, 'store'])
+            ->middleware('throttle:12,1')
+            ->name('tickets.store');
+    });
+
+// Sprint 4 / Checkpoint C2: consultar listado y detalle (HU-10 y HU-12).
+// Administrador consulta todo; solicitante consulta solamente los suyos.
+Route::middleware(['auth', 'active', 'role:administrador,solicitante'])
+    ->group(function (): void {
+        Route::get('/tickets', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'index'])
+            ->name('tickets.index');
+        Route::get('/tickets/{ticket}', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'show'])
+            ->name('tickets.show');
+    });
