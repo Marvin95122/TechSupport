@@ -13,12 +13,6 @@
     </div>
 
     <section class="ts-module-card" aria-label="Listado de usuarios">
-        @if (session('status'))
-            <div class="alert alert-success" role="status">{{ session('status') }}</div>
-        @endif
-        @if ($errors->has('account'))
-            <div class="alert alert-danger" role="alert">{{ $errors->first('account') }}</div>
-        @endif
 
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
@@ -51,7 +45,10 @@
                                     <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">Editar</a>
                                     <form action="{{ route('admin.users.toggle-status', $user) }}"
                                           method="POST"
-                                          onsubmit="return confirm('¿Confirmas que deseas {{ $user->is_active ? 'desactivar' : 'activar' }} esta cuenta?');">
+                                          data-ts-confirm-title="{{ $user->is_active ? 'Desactivar cuenta' : 'Activar cuenta' }}"
+                                          data-ts-confirm="¿Deseas {{ $user->is_active ? 'desactivar' : 'activar' }} la cuenta de {{ $user->name }}? {{ $user->is_active ? 'La persona no podrá acceder hasta que se reactive.' : 'La persona podrá volver a iniciar sesión.' }}"
+                                          data-ts-confirm-action="{{ $user->is_active ? 'Desactivar' : 'Activar' }}"
+                                          data-ts-confirm-variant="{{ $user->is_active ? 'danger' : 'success' }}">
                                         @csrf
                                         @method('PATCH')
                                         <button type="submit"
