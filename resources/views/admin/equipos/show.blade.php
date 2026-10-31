@@ -17,9 +17,6 @@
         </div>
     </div>
 
-    @if (session('status'))
-        <div class="alert alert-success" role="status">{{ session('status') }}</div>
-    @endif
     <section class="ts-module-card">
         <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-3">
             <h2 class="h5 ts-module-title mb-0">Datos del equipo</h2>
@@ -48,7 +45,10 @@
                 <h3 class="h6">Desactivación de equipo</h3>
                 <p class="text-secondary small">La baja es lógica: el equipo dejará de aparecer en el inventario activo, pero sus datos e identificador permanecerán guardados para el historial.</p>
                 <form method="POST" action="{{ route('admin.equipos.deactivate', $equipo) }}"
-                      onsubmit="return confirm('¿Confirmas la desactivación del equipo? No se eliminará su registro.');">
+                      data-ts-confirm-title="Desactivar equipo"
+                      data-ts-confirm="¿Deseas desactivar el equipo {{ $equipo->codigo }}? Dejará de aparecer en el listado activo, pero sus datos se conservarán para el historial."
+                      data-ts-confirm-action="Desactivar equipo"
+                      data-ts-confirm-variant="danger">
                     @csrf
                     @method('PATCH')
                     <button class="btn btn-outline-danger" type="submit">Desactivar equipo</button>

@@ -12,9 +12,6 @@
         <a href="{{ route('admin.equipos.index') }}" class="btn btn-outline-secondary">Volver a equipos</a>
     </div>
 
-    @if (session('status'))
-        <div class="alert alert-success" role="status">{{ session('status') }}</div>
-    @endif
     @if ($errors->any())
         <div class="alert alert-danger" role="alert">Revisa los campos señalados antes de guardar.</div>
     @endif

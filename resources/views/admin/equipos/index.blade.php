@@ -13,9 +13,6 @@
     </div>
 
     <section class="ts-module-card" aria-label="Inventario de equipos">
-        @if (session('status'))
-            <div class="alert alert-success" role="status">{{ session('status') }}</div>
-        @endif
 
         <form method="GET" action="{{ route('admin.equipos.index') }}" class="row g-2 align-items-end mb-4">
             <div class="col-12 col-md-7 col-lg-5">
