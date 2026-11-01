@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Table(name: 'tickets', timestamps: false)]
 #[Fillable([
@@ -63,5 +64,10 @@ class Ticket extends Model
     public function asignadoPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'asignado_por_id');
+    }
+
+    public function cambiosEstado(): HasMany
+    {
+        return $this->hasMany(CambioEstado::class, 'ticket_id');
     }
 }
