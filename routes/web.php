@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
@@ -80,6 +81,7 @@ Route::middleware(['auth', 'active', 'role:administrador'])
         Route::get('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'show'])->name('equipos.show');
         Route::post('/areas', [\App\Http\Controllers\Admin\EquipoController::class, 'storeArea'])->name('areas.store');
     });
+
 // Sprint 3 / Checkpoint C2: edición y baja lógica de equipos.
 Route::middleware(['auth', 'active', 'role:administrador'])
     ->prefix('admin')
@@ -108,4 +110,17 @@ Route::middleware(['auth', 'active', 'role:administrador,solicitante'])
             ->name('tickets.index');
         Route::get('/tickets/{ticket}', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'show'])
             ->name('tickets.show');
+    });
+
+// Sprint 5 / HU-13: asignación de tickets a técnicos activos.
+Route::middleware(['auth', 'active', 'role:administrador'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function (): void {
+        Route::post('/tickets/{ticket}/asignar', [
+            TicketAsignacionController::class,
+            'store',
+        ])
+            ->middleware('throttle:10,1')
+            ->name('tickets.assign');
     });

@@ -5,17 +5,18 @@ namespace App\Http\Controllers\Tickets;
 use App\Http\Controllers\Controller;
 use App\Models\EstadoTicket;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Sprint 4 HU-10/HU-12: lectura sin asignaciones ni cambios de estado. */
+/** Sprint 4 HU-10/HU-12: lectura de tickets y datos necesarios para su detalle. */
 class TicketConsultaController extends Controller
 {
     public function index(Request $request): View
     {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
-        // En el Sprint 4, únicamente el administrador y el solicitante consultan tickets.
+        // El administrador y el solicitante consultan tickets; el solicitante solo los propios.
         abort_unless($esAdministrador || $usuario->role === 'solicitante', 403);
 
         $entradaBuscar = $request->query('buscar', '');
@@ -60,9 +61,26 @@ class TicketConsultaController extends Controller
             'No tienes permisos para consultar esta solicitud.'
         );
 
-        // Las relaciones se consultan aunque un equipo haya sido dado de baja.
-        $ticket->load(['solicitante', 'categoria', 'prioridad', 'estado', 'equipo']);
+        // Se cargan las relaciones necesarias para mostrar solicitante, técnico y autor de asignación.
+        $ticket->load([
+            'solicitante',
+            'categoria',
+            'prioridad',
+            'estado',
+            'equipo',
+            'tecnico',
+            'asignadoPor',
+        ]);
 
-        return view('tickets.show', compact('ticket', 'esAdministrador'));
+        // Solo el administrador recibe el catálogo de técnicos para el formulario de HU-13.
+        $tecnicos = $esAdministrador
+            ? User::query()
+                ->where('role', 'tecnico')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+            : collect();
+
+        return view('tickets.show', compact('ticket', 'esAdministrador', 'tecnicos'));
     }
 }

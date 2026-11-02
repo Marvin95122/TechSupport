@@ -6,9 +6,9 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
@@ -34,5 +34,17 @@ class User extends Authenticatable
     public function cambiosEstado(): HasMany
     {
         return $this->hasMany(CambioEstado::class, 'usuario_id');
+    }
+
+    /** Tickets cuyo técnico responsable es este usuario. */
+    public function ticketsAsignados(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'tecnico_id');
+    }
+
+    /** Tickets que este usuario asignó como administrador. */
+    public function ticketsAsignadosPor(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'asignado_por_id');
     }
 }
