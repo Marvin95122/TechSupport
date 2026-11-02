@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Tickets\MisAsignacionesController;
 use App\Http\Controllers\Tickets\TicketEstadoController;
 use Illuminate\Support\Facades\Route;
 
@@ -110,14 +111,14 @@ Route::middleware(['auth', 'active', 'role:administrador,solicitante'])
             ->name('tickets.index');
     });
 
-// Sprint 4 / HU-12 y Sprint 5 / HU-14: detalle con acceso limitado por propietario o asignacion.
+// Sprint 4 / HU-12 y Sprint 5 / HU-14: detalle con acceso limitado por propietario o asignación.
 Route::middleware(['auth', 'active', 'role:administrador,solicitante,tecnico'])
     ->group(function (): void {
         Route::get('/tickets/{ticket}', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'show'])
             ->name('tickets.show');
     });
 
-// Sprint 5 / HU-13: asignacion de tickets a tecnicos activos.
+// Sprint 5 / HU-13: asignación de tickets a técnicos activos.
 Route::middleware(['auth', 'active', 'role:administrador'])
     ->prefix('admin')
     ->name('admin.')
@@ -130,7 +131,7 @@ Route::middleware(['auth', 'active', 'role:administrador'])
             ->name('tickets.assign');
     });
 
-// Sprint 5 / HU-14: actualizacion secuencial del estado por el tecnico asignado.
+// Sprint 5 / HU-14: actualización secuencial del estado por el técnico asignado.
 Route::middleware(['auth', 'active', 'role:tecnico'])
     ->group(function (): void {
         Route::post('/tickets/{ticket}/estado', [
@@ -140,3 +141,11 @@ Route::middleware(['auth', 'active', 'role:tecnico'])
             ->middleware('throttle:12,1')
             ->name('tickets.estado.update');
     });
+
+// Sprint 5 / HU-15: listado privado de asignaciones del técnico autenticado.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->get('/mis-asignaciones', [
+        MisAsignacionesController::class,
+        'index',
+    ])
+    ->name('tecnico.asignaciones.index');

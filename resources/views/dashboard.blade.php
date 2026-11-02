@@ -7,7 +7,7 @@
         <p class="text-secondary mb-0">Gestiona tus actividades de soporte desde un mismo lugar.</p>
     </div>
 
-    {{-- Indicadores sin datos simulados. Se activarán cuando exista el módulo de tickets. --}}
+    {{-- Indicadores sin datos simulados; las métricas se incorporarán en el módulo de consultas. --}}
     <div class="row g-3 mb-4">
         <div class="col-sm-6 col-xl-3">
             <div class="ts-stat-card">
@@ -20,7 +20,7 @@
             <div class="ts-stat-card">
                 <span class="ts-stat-label">Asignados</span>
                 <strong class="ts-stat-value">—</strong>
-                <small>Se habilitará en Sprint 5</small>
+                <small>Se habilitará en Sprint 7</small>
             </div>
         </div>
         <div class="col-sm-6 col-xl-3">
@@ -58,7 +58,7 @@
                 </div>
                 <div class="col-md-6 col-xl-4">
                     <div class="ts-access-card h-100">
-                        <span class="ts-access-icon" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-monitor"/></svg></span>
+                        <span class="ts-access-icon ts-access-icon--muted" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-monitor"/></svg></span>
                         <h3 class="h6 fw-bold">Equipos tecnológicos</h3>
                         <p class="text-secondary small">Registra, consulta, edita y desactiva equipos.</p>
                         <a href="{{ route('admin.equipos.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir equipos <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
@@ -77,8 +77,8 @@
                     <div class="ts-access-card h-100">
                         <span class="ts-access-icon ts-access-icon--muted" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-clipboard"/></svg></span>
                         <h3 class="h6 fw-bold">Mis asignaciones</h3>
-                        <p class="text-secondary small">Consulta y seguimiento de los tickets asignados.</p>
-                        <span class="badge text-bg-secondary mt-auto align-self-start">Próximo · Sprint 5</span>
+                        <p class="text-secondary small">Consulta los tickets que tienes asignados y accede a su seguimiento.</p>
+                        <a href="{{ route('tecnico.asignaciones.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir mis asignaciones <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
                     </div>
                 </div>
             @elseif (auth()->user()->role === 'solicitante')
