@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Tickets\TicketEstadoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -102,17 +103,21 @@ Route::middleware(['auth', 'active', 'role:solicitante'])
             ->name('tickets.store');
     });
 
-// Sprint 4 / Checkpoint C2: consultar listado y detalle (HU-10 y HU-12).
-// Administrador consulta todo; solicitante consulta solamente los suyos.
+// Sprint 4 / HU-10: listado para administrador y solicitante.
 Route::middleware(['auth', 'active', 'role:administrador,solicitante'])
     ->group(function (): void {
         Route::get('/tickets', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'index'])
             ->name('tickets.index');
+    });
+
+// Sprint 4 / HU-12 y Sprint 5 / HU-14: detalle con acceso limitado por propietario o asignacion.
+Route::middleware(['auth', 'active', 'role:administrador,solicitante,tecnico'])
+    ->group(function (): void {
         Route::get('/tickets/{ticket}', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'show'])
             ->name('tickets.show');
     });
 
-// Sprint 5 / HU-13: asignación de tickets a técnicos activos.
+// Sprint 5 / HU-13: asignacion de tickets a tecnicos activos.
 Route::middleware(['auth', 'active', 'role:administrador'])
     ->prefix('admin')
     ->name('admin.')
@@ -123,4 +128,15 @@ Route::middleware(['auth', 'active', 'role:administrador'])
         ])
             ->middleware('throttle:10,1')
             ->name('tickets.assign');
+    });
+
+// Sprint 5 / HU-14: actualizacion secuencial del estado por el tecnico asignado.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->group(function (): void {
+        Route::post('/tickets/{ticket}/estado', [
+            TicketEstadoController::class,
+            'update',
+        ])
+            ->middleware('throttle:12,1')
+            ->name('tickets.estado.update');
     });

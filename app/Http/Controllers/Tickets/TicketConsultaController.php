@@ -52,16 +52,17 @@ class TicketConsultaController extends Controller
     {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
+        $esTecnico = $usuario->role === 'tecnico';
 
-        // Se aplica en servidor incluso si se conoce la URL/ID de otro ticket.
+        // El solicitante consulta los propios; el tecnico, solo los que tiene asignados.
         abort_unless(
             $esAdministrador ||
-            ($usuario->role === 'solicitante' && (int) $ticket->solicitante_id === (int) $usuario->id),
+            ($usuario->role === 'solicitante' && (int) $ticket->solicitante_id === (int) $usuario->id) ||
+            ($esTecnico && (int) $ticket->tecnico_id === (int) $usuario->id),
             403,
             'No tienes permisos para consultar esta solicitud.'
         );
 
-        // Se cargan las relaciones necesarias para mostrar solicitante, técnico y autor de asignación.
         $ticket->load([
             'solicitante',
             'categoria',
@@ -72,7 +73,7 @@ class TicketConsultaController extends Controller
             'asignadoPor',
         ]);
 
-        // Solo el administrador recibe el catálogo de técnicos para el formulario de HU-13.
+        // Solo el administrador recibe tecnicos activos para el formulario de HU-13.
         $tecnicos = $esAdministrador
             ? User::query()
                 ->where('role', 'tecnico')
@@ -81,6 +82,24 @@ class TicketConsultaController extends Controller
                 ->get(['id', 'name'])
             : collect();
 
-        return view('tickets.show', compact('ticket', 'esAdministrador', 'tecnicos'));
+        // HU-14 permite avanzar una etapa a la vez, sin saltos ni retrocesos.
+        $siguienteEstadoNombre = match ($ticket->estado?->nombre) {
+            'Asignado' => 'En proceso',
+            'En proceso' => 'Resuelto',
+            'Resuelto' => 'Cerrado',
+            default => null,
+        };
+
+        $siguienteEstado = $esTecnico && $siguienteEstadoNombre !== null
+            ? EstadoTicket::query()->where('nombre', $siguienteEstadoNombre)->first()
+            : null;
+
+        return view('tickets.show', compact(
+            'ticket',
+            'esAdministrador',
+            'esTecnico',
+            'tecnicos',
+            'siguienteEstado'
+        ));
     }
 }
