@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Tickets\MisAsignacionesController;
+use App\Http\Controllers\Tickets\TicketEstadoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -80,6 +83,7 @@ Route::middleware(['auth', 'active', 'role:administrador'])
         Route::get('/equipos/{equipo}', [\App\Http\Controllers\Admin\EquipoController::class, 'show'])->name('equipos.show');
         Route::post('/areas', [\App\Http\Controllers\Admin\EquipoController::class, 'storeArea'])->name('areas.store');
     });
+
 // Sprint 3 / Checkpoint C2: edición y baja lógica de equipos.
 Route::middleware(['auth', 'active', 'role:administrador'])
     ->prefix('admin')
@@ -100,12 +104,48 @@ Route::middleware(['auth', 'active', 'role:solicitante'])
             ->name('tickets.store');
     });
 
-// Sprint 4 / Checkpoint C2: consultar listado y detalle (HU-10 y HU-12).
-// Administrador consulta todo; solicitante consulta solamente los suyos.
+// Sprint 4 / HU-10: listado para administrador y solicitante.
 Route::middleware(['auth', 'active', 'role:administrador,solicitante'])
     ->group(function (): void {
         Route::get('/tickets', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'index'])
             ->name('tickets.index');
+    });
+
+// Sprint 4 / HU-12 y Sprint 5 / HU-14: detalle con acceso limitado por propietario o asignación.
+Route::middleware(['auth', 'active', 'role:administrador,solicitante,tecnico'])
+    ->group(function (): void {
         Route::get('/tickets/{ticket}', [\App\Http\Controllers\Tickets\TicketConsultaController::class, 'show'])
             ->name('tickets.show');
     });
+
+// Sprint 5 / HU-13: asignación de tickets a técnicos activos.
+Route::middleware(['auth', 'active', 'role:administrador'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function (): void {
+        Route::post('/tickets/{ticket}/asignar', [
+            TicketAsignacionController::class,
+            'store',
+        ])
+            ->middleware('throttle:10,1')
+            ->name('tickets.assign');
+    });
+
+// Sprint 5 / HU-14: actualización secuencial del estado por el técnico asignado.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->group(function (): void {
+        Route::post('/tickets/{ticket}/estado', [
+            TicketEstadoController::class,
+            'update',
+        ])
+            ->middleware('throttle:12,1')
+            ->name('tickets.estado.update');
+    });
+
+// Sprint 5 / HU-15: listado privado de asignaciones del técnico autenticado.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->get('/mis-asignaciones', [
+        MisAsignacionesController::class,
+        'index',
+    ])
+    ->name('tecnico.asignaciones.index');

@@ -5,17 +5,18 @@ namespace App\Http\Controllers\Tickets;
 use App\Http\Controllers\Controller;
 use App\Models\EstadoTicket;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Sprint 4 HU-10/HU-12: lectura sin asignaciones ni cambios de estado. */
+/** Sprint 4 HU-10/HU-12: lectura de tickets y datos necesarios para su detalle. */
 class TicketConsultaController extends Controller
 {
     public function index(Request $request): View
     {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
-        // En el Sprint 4, únicamente el administrador y el solicitante consultan tickets.
+        // El administrador y el solicitante consultan tickets; el solicitante solo los propios.
         abort_unless($esAdministrador || $usuario->role === 'solicitante', 403);
 
         $entradaBuscar = $request->query('buscar', '');
@@ -51,18 +52,54 @@ class TicketConsultaController extends Controller
     {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
+        $esTecnico = $usuario->role === 'tecnico';
 
-        // Se aplica en servidor incluso si se conoce la URL/ID de otro ticket.
+        // El solicitante consulta los propios; el tecnico, solo los que tiene asignados.
         abort_unless(
             $esAdministrador ||
-            ($usuario->role === 'solicitante' && (int) $ticket->solicitante_id === (int) $usuario->id),
+            ($usuario->role === 'solicitante' && (int) $ticket->solicitante_id === (int) $usuario->id) ||
+            ($esTecnico && (int) $ticket->tecnico_id === (int) $usuario->id),
             403,
             'No tienes permisos para consultar esta solicitud.'
         );
 
-        // Las relaciones se consultan aunque un equipo haya sido dado de baja.
-        $ticket->load(['solicitante', 'categoria', 'prioridad', 'estado', 'equipo']);
+        $ticket->load([
+            'solicitante',
+            'categoria',
+            'prioridad',
+            'estado',
+            'equipo',
+            'tecnico',
+            'asignadoPor',
+        ]);
 
-        return view('tickets.show', compact('ticket', 'esAdministrador'));
+        // Solo el administrador recibe tecnicos activos para el formulario de HU-13.
+        $tecnicos = $esAdministrador
+            ? User::query()
+                ->where('role', 'tecnico')
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+            : collect();
+
+        // HU-14 permite avanzar una etapa a la vez, sin saltos ni retrocesos.
+        $siguienteEstadoNombre = match ($ticket->estado?->nombre) {
+            'Asignado' => 'En proceso',
+            'En proceso' => 'Resuelto',
+            'Resuelto' => 'Cerrado',
+            default => null,
+        };
+
+        $siguienteEstado = $esTecnico && $siguienteEstadoNombre !== null
+            ? EstadoTicket::query()->where('nombre', $siguienteEstadoNombre)->first()
+            : null;
+
+        return view('tickets.show', compact(
+            'ticket',
+            'esAdministrador',
+            'esTecnico',
+            'tecnicos',
+            'siguienteEstado'
+        ));
     }
 }

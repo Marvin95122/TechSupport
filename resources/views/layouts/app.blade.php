@@ -79,14 +79,12 @@
                             <span class="ts-nav-text">Consultas</span><small class="ts-nav-meta">Sprint 7</small>
                         </span>
                     @elseif ($currentRole === 'tecnico')
-                        <span class="ts-nav-link ts-nav-upcoming" title="Mis asignaciones: Sprint 5">
+                        <a href="{{ route('tecnico.asignaciones.index') }}" aria-label="Mis asignaciones" title="Mis asignaciones"
+                           class="ts-nav-link {{ request()->routeIs('tecnico.asignaciones.index', 'tickets.show') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('tecnico.asignaciones.index', 'tickets.show')) aria-current="page" @endif>
                             <svg class="ts-icon"><use href="#ts-icon-clipboard"/></svg>
-                            <span class="ts-nav-text">Mis asignaciones</span><small class="ts-nav-meta">Sprint 5</small>
-                        </span>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Seguimiento: Sprint 5">
-                            <svg class="ts-icon"><use href="#ts-icon-activity"/></svg>
-                            <span class="ts-nav-text">Seguimiento</span><small class="ts-nav-meta">Sprint 5</small>
-                        </span>
+                            <span class="ts-nav-text">Mis asignaciones</span>
+                        </a>
                         <span class="ts-nav-link ts-nav-upcoming" title="Historial: Sprint 6">
                             <svg class="ts-icon"><use href="#ts-icon-history"/></svg>
                             <span class="ts-nav-text">Historial</span><small class="ts-nav-meta">Sprint 6</small>
