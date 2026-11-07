@@ -6,17 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\EstadoTicket;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Services\TicketTimelineService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Sprint 4 HU-10/HU-12: lectura de tickets y datos necesarios para su detalle. */
+/** Sprint 4 HU-10/HU-12 y Sprint 6 HU-19: lectura de tickets e historial. */
 class TicketConsultaController extends Controller
 {
     public function index(Request $request): View
     {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
-        // El administrador y el solicitante consultan tickets; el solicitante solo los propios.
         abort_unless($esAdministrador || $usuario->role === 'solicitante', 403);
 
         $entradaBuscar = $request->query('buscar', '');
@@ -32,7 +32,7 @@ class TicketConsultaController extends Controller
             ->when($buscar !== '', function ($query) use ($buscar): void {
                 $query->where(function ($q) use ($buscar): void {
                     $q->where('folio', 'like', '%'.$buscar.'%')
-                      ->orWhere('asunto', 'like', '%'.$buscar.'%');
+                        ->orWhere('asunto', 'like', '%'.$buscar.'%');
                 });
             })
             ->when($estado !== '', function ($query) use ($estado): void {
@@ -45,16 +45,24 @@ class TicketConsultaController extends Controller
 
         $estados = EstadoTicket::query()->orderBy('orden')->get();
 
-        return view('tickets.index', compact('tickets', 'estados', 'buscar', 'estado', 'esAdministrador'));
+        return view('tickets.index', compact(
+            'tickets',
+            'estados',
+            'buscar',
+            'estado',
+            'esAdministrador'
+        ));
     }
 
-    public function show(Request $request, Ticket $ticket): View
-    {
+    public function show(
+        Request $request,
+        Ticket $ticket,
+        TicketTimelineService $timelineService
+    ): View {
         $usuario = $request->user();
         $esAdministrador = $usuario->role === 'administrador';
         $esTecnico = $usuario->role === 'tecnico';
 
-        // El solicitante consulta los propios; el tecnico, solo los que tiene asignados.
         abort_unless(
             $esAdministrador ||
             ($usuario->role === 'solicitante' && (int) $ticket->solicitante_id === (int) $usuario->id) ||
@@ -71,9 +79,13 @@ class TicketConsultaController extends Controller
             'equipo',
             'tecnico',
             'asignadoPor',
+            'cambiosEstado.usuario',
+            'cambiosEstado.estadoAnterior',
+            'cambiosEstado.estadoNuevo',
+            'observaciones.usuario',
+            'soluciones.usuario',
         ]);
 
-        // Solo el administrador recibe tecnicos activos para el formulario de HU-13.
         $tecnicos = $esAdministrador
             ? User::query()
                 ->where('role', 'tecnico')
@@ -82,7 +94,6 @@ class TicketConsultaController extends Controller
                 ->get(['id', 'name'])
             : collect();
 
-        // HU-14 permite avanzar una etapa a la vez, sin saltos ni retrocesos.
         $siguienteEstadoNombre = match ($ticket->estado?->nombre) {
             'Asignado' => 'En proceso',
             'En proceso' => 'Resuelto',
@@ -94,12 +105,15 @@ class TicketConsultaController extends Controller
             ? EstadoTicket::query()->where('nombre', $siguienteEstadoNombre)->first()
             : null;
 
+        $historial = $timelineService->build($ticket);
+
         return view('tickets.show', compact(
             'ticket',
             'esAdministrador',
             'esTecnico',
             'tecnicos',
-            'siguienteEstado'
+            'siguienteEstado',
+            'historial'
         ));
     }
 }

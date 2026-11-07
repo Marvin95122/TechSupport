@@ -48,6 +48,13 @@
                             @unless ($ticket->equipo->activo)
                                 <span class="badge text-bg-secondary ms-1">Equipo inactivo</span>
                             @endunless
+                            @if ($esAdministrador || $esTecnico)
+                                <div class="mt-2">
+                                    <a href="{{ route('equipos.historial', $ticket->equipo) }}" class="btn btn-sm btn-outline-primary">
+                                        Consultar historial del equipo
+                                    </a>
+                                </div>
+                            @endif
                         @else
                             Ninguno
                         @endif
@@ -182,4 +189,7 @@
             @endif
         </div>
     </div>
+
+    @include('tickets.partials.registro-atencion')
+    @include('tickets.partials.historial')
 @endsection

@@ -70,4 +70,14 @@ class Ticket extends Model
     {
         return $this->hasMany(CambioEstado::class, 'ticket_id');
     }
+
+    public function observaciones(): HasMany
+    {
+        return $this->hasMany(TicketObservacion::class, 'ticket_id');
+    }
+
+    public function soluciones(): HasMany
+    {
+        return $this->hasMany(TicketSolucion::class, 'ticket_id');
+    }
 }
