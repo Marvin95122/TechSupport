@@ -3,8 +3,11 @@
 use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Equipos\EquipoHistorialController;
 use App\Http\Controllers\Tickets\MisAsignacionesController;
 use App\Http\Controllers\Tickets\TicketEstadoController;
+use App\Http\Controllers\Tickets\TicketObservacionController;
+use App\Http\Controllers\Tickets\TicketSolucionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -149,3 +152,29 @@ Route::middleware(['auth', 'active', 'role:tecnico'])
         'index',
     ])
     ->name('tecnico.asignaciones.index');
+
+// Sprint 6 / HU-17: registro append-only de observaciones y actividades.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->post('/tickets/{ticket}/observaciones', [
+        TicketObservacionController::class,
+        'store',
+    ])
+    ->middleware('throttle:20,1')
+    ->name('tickets.observaciones.store');
+
+// Sprint 6 / HU-18: registro de diagnóstico y solución aplicada.
+Route::middleware(['auth', 'active', 'role:tecnico'])
+    ->post('/tickets/{ticket}/soluciones', [
+        TicketSolucionController::class,
+        'store',
+    ])
+    ->middleware('throttle:10,1')
+    ->name('tickets.soluciones.store');
+
+// Sprint 6 / HU-20: historial de incidencias de un equipo.
+Route::middleware(['auth', 'active', 'role:administrador,tecnico'])
+    ->get('/equipos/{equipo}/historial', [
+        EquipoHistorialController::class,
+        'show',
+    ])
+    ->name('equipos.historial');

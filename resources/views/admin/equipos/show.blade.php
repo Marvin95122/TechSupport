@@ -10,6 +10,7 @@
             <p class="text-secondary mb-0">Información registrada del recurso tecnológico.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('equipos.historial', $equipo) }}" class="btn btn-outline-primary">Historial de incidencias</a>
             @if ($equipo->activo)
                 <a href="{{ route('admin.equipos.edit', $equipo) }}" class="btn btn-primary">Editar equipo</a>
             @endif
