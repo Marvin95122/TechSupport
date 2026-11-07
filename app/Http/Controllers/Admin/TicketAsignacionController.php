@@ -7,6 +7,7 @@ use App\Models\CambioEstado;
 use App\Models\EstadoTicket;
 use App\Models\Ticket;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,6 @@ class TicketAsignacionController extends Controller
 {
     /**
      * HU-13: asigna un ticket pendiente a un técnico activo.
-     *
      * La transacción conserva juntos la asignación y su cambio de estado.
      */
     public function store(Request $request, Ticket $ticket): RedirectResponse
@@ -36,19 +36,13 @@ class TicketAsignacionController extends Controller
         ]);
 
         $nombreTecnico = DB::transaction(function () use ($request, $ticket, $datos): string {
-            // Se bloquea el ticket para impedir dos asignaciones simultáneas.
             $ticketActual = Ticket::query()
                 ->whereKey($ticket->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $pendiente = EstadoTicket::query()
-                ->where('nombre', 'Pendiente')
-                ->first();
-
-            $asignado = EstadoTicket::query()
-                ->where('nombre', 'Asignado')
-                ->first();
+            $pendiente = EstadoTicket::query()->where('nombre', 'Pendiente')->first();
+            $asignado = EstadoTicket::query()->where('nombre', 'Asignado')->first();
 
             if (! $pendiente || ! $asignado) {
                 throw ValidationException::withMessages([
@@ -66,7 +60,6 @@ class TicketAsignacionController extends Controller
                 ]);
             }
 
-            // Se vuelve a comprobar dentro de la transacción por si la cuenta cambió.
             $tecnico = User::query()
                 ->whereKey($datos['tecnico_id'])
                 ->where('role', 'tecnico')
@@ -81,7 +74,6 @@ class TicketAsignacionController extends Controller
             }
 
             $fechaAsignacion = now();
-
             $ticketActual->forceFill([
                 'tecnico_id' => $tecnico->id,
                 'asignado_por_id' => $request->user()->id,
@@ -106,5 +98,38 @@ class TicketAsignacionController extends Controller
                 'status',
                 "Ticket {$ticket->folio} asignado correctamente a {$nombreTecnico}. Estado actualizado a Asignado."
             );
+    }
+
+    /**
+     * Búsqueda remota de técnicos activos para el selector de asignación.
+     * Devuelve como máximo diez coincidencias y nunca expone otras cuentas.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $datos = $request->validate([
+            'q' => ['required', 'string', 'min:2', 'max:80'],
+        ]);
+
+        $termino = trim($datos['q']);
+        $comodinSeguro = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $termino);
+        $coincidencia = '%'.$comodinSeguro.'%';
+
+        $tecnicos = User::query()
+            ->where('role', 'tecnico')
+            ->where('is_active', true)
+            ->where(function ($query) use ($coincidencia): void {
+                $query->where('name', 'like', $coincidencia)
+                    ->orWhere('email', 'like', $coincidencia);
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'email'])
+            ->map(static fn (User $tecnico): array => [
+                'id' => $tecnico->id,
+                'name' => $tecnico->name,
+                'email' => $tecnico->email,
+            ]);
+
+        return response()->json($tecnicos->values());
     }
 }

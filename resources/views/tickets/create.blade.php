@@ -7,7 +7,7 @@
             <h1 class="ts-page-heading">Nueva solicitud de soporte</h1>
             <p class="text-secondary mb-0">Describe la incidencia para que el área técnica pueda recibirla y darle seguimiento.</p>
         </div>
-        <span class="badge text-bg-light border align-self-start px-3 py-2">Sprint 4 · Registro</span>
+        <span class="badge text-bg-light border align-self-start px-3 py-2">Nueva solicitud</span>
     </div>
 
     @if ($errors->any())

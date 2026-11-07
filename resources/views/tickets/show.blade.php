@@ -10,6 +10,10 @@
             'Cerrado' => 'dark',
             default => 'secondary',
         };
+        $rutaVolver = $esTecnico
+            ? route('tecnico.asignaciones.index')
+            : route('tickets.index');
+        $textoVolver = $esAdministrador ? 'consultas' : ($esTecnico ? 'mis asignaciones' : 'mis tickets');
     @endphp
 
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
@@ -18,7 +22,7 @@
             <h1 class="ts-page-heading">Detalle de solicitud</h1>
             <p class="text-secondary mb-0">Folio: <strong>{{ $ticket->folio }}</strong></p>
         </div>
-        <a href="{{ $esTecnico ? route('dashboard') : route('tickets.index') }}" class="btn btn-outline-secondary">Volver a {{ $esAdministrador ? 'tickets' : ($esTecnico ? 'inicio' : 'mis tickets') }}</a>
+        <a href="{{ $rutaVolver }}" class="btn btn-outline-secondary">Volver a {{ $textoVolver }}</a>
     </div>
 
     <div class="row g-4">
@@ -29,9 +33,7 @@
                         <span class="text-secondary small d-block mb-1">Asunto</span>
                         <h2 class="h4 fw-bold mb-0">{{ $ticket->asunto }}</h2>
                     </div>
-                    <span class="badge text-bg-{{ $estadoBadge }}">
-                        {{ $ticket->estado?->nombre ?? 'No disponible' }}
-                    </span>
+                    <span class="badge text-bg-{{ $estadoBadge }}">{{ $ticket->estado?->nombre ?? 'No disponible' }}</span>
                 </div>
                 <h3 class="h6 fw-bold">Descripción de la incidencia</h3>
                 <p class="mb-4" style="white-space: pre-wrap; overflow-wrap: anywhere;">{{ $ticket->descripcion }}</p>
@@ -81,9 +83,7 @@
                     <span class="badge text-bg-secondary">2</span>
                     <div>
                         <strong class="d-block">Atención técnica</strong>
-                        <p class="text-secondary small mb-0">
-                            Estado actual: {{ $ticket->estado?->nombre ?? 'No disponible' }}.
-                        </p>
+                        <p class="text-secondary small mb-0">Estado actual: {{ $ticket->estado?->nombre ?? 'No disponible' }}.</p>
                     </div>
                 </div>
             </section>
@@ -104,37 +104,48 @@
                             <dd class="col-7">{{ $ticket->asignado_en?->format('d/m/Y H:i') ?? 'No disponible' }}</dd>
                         </dl>
                     @elseif ($ticket->estado?->nombre === 'Pendiente')
-                        <p class="text-secondary small">
-                            Selecciona un técnico activo para hacerse responsable de esta solicitud.
-                        </p>
+                        <p class="text-secondary small">Busca un técnico activo por nombre o correo. Se mostrarán hasta diez coincidencias.</p>
 
-                        @if ($tecnicos->isNotEmpty())
-                            <form action="{{ route('admin.tickets.assign', $ticket) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="tecnico_id" class="form-label fw-semibold">Técnico responsable</label>
-                                    <select id="tecnico_id" name="tecnico_id"
-                                            class="form-select @error('tecnico_id') is-invalid @enderror" required>
-                                        <option value="">Selecciona un técnico</option>
-                                        @foreach ($tecnicos as $tecnico)
-                                            <option value="{{ $tecnico->id }}" @selected((string) old('tecnico_id') === (string) $tecnico->id)>
-                                                {{ $tecnico->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('tecnico_id')
-                                        <div class="invalid-feedback d-block" role="alert">{{ $message }}</div>
-                                    @enderror
+                        <form action="{{ route('admin.tickets.assign', $ticket) }}" method="POST" data-ts-technician-form>
+                            @csrf
+                            <div class="mb-3 ts-technician-picker"
+                                 data-ts-technician-picker
+                                 data-search-url="{{ route('admin.tecnicos.search') }}">
+                                <label for="tecnico_busqueda" class="form-label fw-semibold">Buscar técnico responsable</label>
+                                <div class="input-group ts-technician-input-group">
+                                    <input id="tecnico_busqueda"
+                                           type="search"
+                                           class="form-control @error('tecnico_id') is-invalid @enderror"
+                                           value="{{ $tecnicoSeleccionado?->name ?? '' }}"
+                                           placeholder="Escribe al menos 2 caracteres"
+                                           autocomplete="off"
+                                           required
+                                           role="combobox"
+                                           aria-autocomplete="list"
+                                           aria-expanded="false"
+                                           aria-controls="tecnicos-resultados"
+                                           aria-describedby="tecnico-ayuda tecnico-estado"
+                                           data-ts-technician-input>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                            data-ts-technician-clear aria-label="Limpiar técnico seleccionado">
+                                        Limpiar
+                                    </button>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    Asignar técnico
-                                </button>
-                            </form>
-                        @else
-                            <div class="alert alert-warning mb-0" role="status">
-                                No hay técnicos activos disponibles para asignar esta solicitud.
+                                <input type="hidden" name="tecnico_id"
+                                       value="{{ $tecnicoSeleccionado?->id ?? '' }}"
+                                       data-ts-technician-id>
+                                <div id="tecnicos-resultados" class="ts-combobox-options" role="listbox"
+                                     aria-label="Coincidencias de técnicos" data-ts-technician-options hidden></div>
+                                <p id="tecnico-ayuda" class="form-text mb-1">Solo aparecen cuentas activas con rol Técnico.</p>
+                                <p id="tecnico-estado" class="form-text mb-0" aria-live="polite" data-ts-technician-status>
+                                    {{ $tecnicoSeleccionado ? 'Técnico seleccionado: '.$tecnicoSeleccionado->name : 'Escribe para buscar y selecciona una coincidencia.' }}
+                                </p>
+                                @error('tecnico_id')
+                                    <div class="invalid-feedback d-block" role="alert">{{ $message }}</div>
+                                @enderror
                             </div>
-                        @endif
+                            <button type="submit" class="btn btn-primary w-100">Asignar técnico</button>
+                        </form>
                     @else
                         <div class="alert alert-info mb-0" role="status">
                             Este ticket ya no está pendiente y no puede asignarse desde esta pantalla.
@@ -144,9 +155,7 @@
             @elseif ($esTecnico)
                 <section class="ts-module-card" aria-label="Seguimiento técnico">
                     <h2 class="h5 fw-bold mb-2">Seguimiento técnico</h2>
-                    <p class="text-secondary small">
-                        Actualiza el estado conforme avance la atención de esta solicitud.
-                    </p>
+                    <p class="text-secondary small">Actualiza el estado conforme avance la atención de esta solicitud.</p>
 
                     <dl class="row g-2 small mb-3">
                         <dt class="col-5">Técnico responsable</dt>
@@ -158,9 +167,7 @@
                     </dl>
 
                     @if ($siguienteEstado)
-                        <div class="alert alert-info" role="status">
-                            Próximo estado: <strong>{{ $siguienteEstado->nombre }}</strong>
-                        </div>
+                        <div class="alert alert-info" role="status">Próximo estado: <strong>{{ $siguienteEstado->nombre }}</strong></div>
                         <form action="{{ route('tickets.estado.update', $ticket) }}" method="POST">
                             @csrf
                             <input type="hidden" name="estado_id" value="{{ $siguienteEstado->id }}">
@@ -177,13 +184,9 @@
                             </button>
                         </form>
                     @elseif ($ticket->estado?->nombre === 'Cerrado')
-                        <div class="alert alert-success mb-0" role="status">
-                            Este ticket ya fue cerrado. No admite más cambios de estado.
-                        </div>
+                        <div class="alert alert-success mb-0" role="status">Este ticket ya fue cerrado. No admite más cambios de estado.</div>
                     @else
-                        <div class="alert alert-warning mb-0" role="status">
-                            Este ticket no tiene una transición disponible. Contacta al administrador.
-                        </div>
+                        <div class="alert alert-warning mb-0" role="status">Este ticket no tiene una transición disponible. Contacta al administrador.</div>
                     @endif
                 </section>
             @endif
