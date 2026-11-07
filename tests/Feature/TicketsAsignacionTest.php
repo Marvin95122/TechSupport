@@ -21,11 +21,8 @@ class TicketsAsignacionTest extends TestCase
         $this->seed(CatalogosTicketsSeeder::class);
     }
 
-    private function usuario(
-        string $rol = 'solicitante',
-        bool $activo = true,
-        array $atributos = []
-    ): User {
+    private function usuario(string $rol = 'solicitante', bool $activo = true, array $atributos = []): User
+    {
         return User::factory()->create(array_merge([
             'role' => $rol,
             'is_active' => $activo,
@@ -49,11 +46,9 @@ class TicketsAsignacionTest extends TestCase
     public function test_visitante_no_puede_asignar_un_ticket(): void
     {
         $ticket = $this->ticket($this->usuario(), 'VISITANTE');
-
         $this->post(route('admin.tickets.assign', $ticket), [
             'tecnico_id' => $this->usuario('tecnico')->id,
         ])->assertRedirect(route('login'));
-
         $this->assertDatabaseCount('cambios_estado', 0);
     }
 
@@ -63,12 +58,8 @@ class TicketsAsignacionTest extends TestCase
         $tecnico = $this->usuario('tecnico');
 
         foreach (['solicitante', 'tecnico'] as $rol) {
-            $usuario = $this->usuario($rol);
-
-            $this->actingAs($usuario)
-                ->post(route('admin.tickets.assign', $ticket), [
-                    'tecnico_id' => $tecnico->id,
-                ])
+            $this->actingAs($this->usuario($rol))
+                ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $tecnico->id])
                 ->assertForbidden();
         }
 
@@ -82,14 +73,11 @@ class TicketsAsignacionTest extends TestCase
         $ticket = $this->ticket($this->usuario(), 'CORRECTA');
 
         $this->actingAs($administrador)
-            ->post(route('admin.tickets.assign', $ticket), [
-                'tecnico_id' => $tecnico->id,
-            ])
+            ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $tecnico->id])
             ->assertRedirect(route('tickets.show', $ticket))
             ->assertSessionHas('status');
 
         $ticketActual = $ticket->fresh();
-
         $this->assertSame($tecnico->id, $ticketActual->tecnico_id);
         $this->assertSame($administrador->id, $ticketActual->asignado_por_id);
         $this->assertSame('Asignado', $ticketActual->estado->nombre);
@@ -101,7 +89,6 @@ class TicketsAsignacionTest extends TestCase
             'estado_anterior_id' => EstadoTicket::where('nombre', 'Pendiente')->firstOrFail()->id,
             'estado_nuevo_id' => EstadoTicket::where('nombre', 'Asignado')->firstOrFail()->id,
         ]);
-
         $this->assertDatabaseCount('cambios_estado', 1);
     }
 
@@ -113,9 +100,7 @@ class TicketsAsignacionTest extends TestCase
 
         $this->actingAs($administrador)
             ->from(route('tickets.show', $ticket))
-            ->post(route('admin.tickets.assign', $ticket), [
-                'tecnico_id' => $tecnicoInactivo->id,
-            ])
+            ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $tecnicoInactivo->id])
             ->assertSessionHasErrors('tecnico_id');
 
         $this->assertNull($ticket->fresh()->tecnico_id);
@@ -131,9 +116,7 @@ class TicketsAsignacionTest extends TestCase
 
         $this->actingAs($administrador)
             ->from(route('tickets.show', $ticket))
-            ->post(route('admin.tickets.assign', $ticket), [
-                'tecnico_id' => $solicitante->id,
-            ])
+            ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $solicitante->id])
             ->assertSessionHasErrors('tecnico_id');
 
         $this->assertNull($ticket->fresh()->tecnico_id);
@@ -151,9 +134,7 @@ class TicketsAsignacionTest extends TestCase
 
         $this->actingAs($administrador)
             ->from(route('tickets.show', $ticket))
-            ->post(route('admin.tickets.assign', $ticket), [
-                'tecnico_id' => $tecnico->id,
-            ])
+            ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $tecnico->id])
             ->assertSessionHasErrors('tecnico_id');
 
         $this->assertNull($ticket->fresh()->tecnico_id);
@@ -175,16 +156,14 @@ class TicketsAsignacionTest extends TestCase
 
         $this->actingAs($administrador)
             ->from(route('tickets.show', $ticket))
-            ->post(route('admin.tickets.assign', $ticket), [
-                'tecnico_id' => $otroTecnico->id,
-            ])
+            ->post(route('admin.tickets.assign', $ticket), ['tecnico_id' => $otroTecnico->id])
             ->assertSessionHasErrors('tecnico_id');
 
         $this->assertSame($tecnicoActual->id, $ticket->fresh()->tecnico_id);
         $this->assertDatabaseCount('cambios_estado', 0);
     }
 
-    public function test_administrador_solo_visualiza_tecnicos_activos_en_el_formulario(): void
+    public function test_administrador_ve_el_selector_busqueda_y_no_carga_el_catalogo_completo(): void
     {
         $administrador = $this->usuario('administrador');
         $ticket = $this->ticket($this->usuario(), 'FORMULARIO');
@@ -195,7 +174,8 @@ class TicketsAsignacionTest extends TestCase
             ->get(route('tickets.show', $ticket))
             ->assertOk()
             ->assertSee('Asignación técnica')
-            ->assertSee('Técnico disponible')
+            ->assertSee('Buscar técnico responsable')
+            ->assertSee('data-ts-technician-picker', false)
             ->assertDontSee('Técnico inactivo');
     }
 

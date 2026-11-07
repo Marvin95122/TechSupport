@@ -29,7 +29,10 @@ class TicketsConsultaDetalleTest extends TestCase
 
     private function ticket(User $solicitante, string $sufijo, array $cambios = []): Ticket
     {
-        return Ticket::create(array_merge([
+        $tecnicoId = $cambios['tecnico_id'] ?? null;
+        unset($cambios['tecnico_id']);
+
+        $ticket = Ticket::create(array_merge([
             'folio' => 'TS-TEST-'.$sufijo,
             'solicitante_id' => $solicitante->id,
             'equipo_id' => null,
@@ -39,6 +42,12 @@ class TicketsConsultaDetalleTest extends TestCase
             'asunto' => 'Incidencia '.$sufijo,
             'descripcion' => 'La cámara de la unidad presenta un problema de conexión.',
         ], $cambios));
+
+        if ($tecnicoId !== null) {
+            $ticket->forceFill(['tecnico_id' => $tecnicoId])->save();
+        }
+
+        return $ticket;
     }
 
     public function test_visitante_no_puede_consultar_listado_ni_detalle(): void
@@ -48,12 +57,27 @@ class TicketsConsultaDetalleTest extends TestCase
         $this->get(route('tickets.show', $ticket))->assertRedirect(route('login'));
     }
 
-    public function test_tecnico_no_puede_consultar_los_tickets_en_el_sprint_4(): void
+    public function test_tecnico_solo_consulta_tickets_asignados_a_su_cuenta(): void
     {
-        $ticket = $this->ticket($this->usuario(), 'TECNICO');
-        $this->actingAs($this->usuario('tecnico'));
-        $this->get(route('tickets.index'))->assertForbidden();
-        $this->get(route('tickets.show', $ticket))->assertForbidden();
+        $tecnico = $this->usuario('tecnico');
+        $otroTecnico = $this->usuario('tecnico');
+        $propio = $this->ticket($this->usuario(), 'TECNICO-PROPIO', [
+            'tecnico_id' => $tecnico->id,
+            'estado_id' => EstadoTicket::where('nombre', 'Asignado')->firstOrFail()->id,
+        ]);
+        $ajeno = $this->ticket($this->usuario(), 'TECNICO-AJENO', [
+            'tecnico_id' => $otroTecnico->id,
+            'estado_id' => EstadoTicket::where('nombre', 'Asignado')->firstOrFail()->id,
+        ]);
+
+        $this->actingAs($tecnico)
+            ->get(route('tickets.index'))
+            ->assertOk()
+            ->assertSee($propio->folio)
+            ->assertDontSee($ajeno->folio);
+
+        $this->get(route('tickets.show', $propio))->assertOk();
+        $this->get(route('tickets.show', $ajeno))->assertForbidden();
     }
 
     public function test_solicitante_solo_ve_sus_propias_solicitudes(): void

@@ -51,6 +51,7 @@
                         <svg class="ts-icon"><use href="#ts-icon-home"/></svg>
                         <span class="ts-nav-text">Inicio</span>
                     </a>
+
                     @if ($currentRole === 'administrador')
                         <a href="{{ route('admin.users.index') }}" aria-label="Usuarios" title="Usuarios"
                            class="ts-nav-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}"
@@ -64,20 +65,18 @@
                             <svg class="ts-icon"><use href="#ts-icon-monitor"/></svg>
                             <span class="ts-nav-text">Equipos</span>
                         </a>
-                        <a href="{{ route('tickets.index') }}" aria-label="Tickets registrados" title="Tickets registrados"
+                        <a href="{{ route('tickets.index') }}" aria-label="Consultas de tickets" title="Consultas"
                            class="ts-nav-link {{ request()->routeIs('tickets.index', 'tickets.show') ? 'is-active' : '' }}"
                            @if(request()->routeIs('tickets.index', 'tickets.show')) aria-current="page" @endif>
-                            <svg class="ts-icon"><use href="#ts-icon-ticket"/></svg>
-                            <span class="ts-nav-text">Tickets</span>
-                        </a>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Historial: Sprint 6">
-                            <svg class="ts-icon"><use href="#ts-icon-history"/></svg>
-                            <span class="ts-nav-text">Historial</span><small class="ts-nav-meta">Sprint 6</small>
-                        </span>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Consultas: Sprint 7">
                             <svg class="ts-icon"><use href="#ts-icon-chart"/></svg>
-                            <span class="ts-nav-text">Consultas</span><small class="ts-nav-meta">Sprint 7</small>
-                        </span>
+                            <span class="ts-nav-text">Consultas</span>
+                        </a>
+                        <a href="{{ route('historial.index') }}" aria-label="Historial de atención" title="Historial"
+                           class="ts-nav-link {{ request()->routeIs('historial.index') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('historial.index')) aria-current="page" @endif>
+                            <svg class="ts-icon"><use href="#ts-icon-history"/></svg>
+                            <span class="ts-nav-text">Historial</span>
+                        </a>
                     @elseif ($currentRole === 'tecnico')
                         <a href="{{ route('tecnico.asignaciones.index') }}" aria-label="Mis asignaciones" title="Mis asignaciones"
                            class="ts-nav-link {{ request()->routeIs('tecnico.asignaciones.index', 'tickets.show') ? 'is-active' : '' }}"
@@ -85,10 +84,18 @@
                             <svg class="ts-icon"><use href="#ts-icon-clipboard"/></svg>
                             <span class="ts-nav-text">Mis asignaciones</span>
                         </a>
-                        <span class="ts-nav-link ts-nav-upcoming" title="Historial: Sprint 6">
+                        <a href="{{ route('tickets.index') }}" aria-label="Consultar tickets asignados" title="Consultas"
+                           class="ts-nav-link {{ request()->routeIs('tickets.index') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('tickets.index')) aria-current="page" @endif>
+                            <svg class="ts-icon"><use href="#ts-icon-chart"/></svg>
+                            <span class="ts-nav-text">Consultas</span>
+                        </a>
+                        <a href="{{ route('historial.index') }}" aria-label="Historial de atención" title="Historial"
+                           class="ts-nav-link {{ request()->routeIs('historial.index') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('historial.index')) aria-current="page" @endif>
                             <svg class="ts-icon"><use href="#ts-icon-history"/></svg>
-                            <span class="ts-nav-text">Historial</span><small class="ts-nav-meta">Sprint 6</small>
-                        </span>
+                            <span class="ts-nav-text">Historial</span>
+                        </a>
                     @elseif ($currentRole === 'solicitante')
                         <a href="{{ route('tickets.create') }}" aria-label="Nueva solicitud" title="Nueva solicitud"
                            class="ts-nav-link {{ request()->routeIs('tickets.create') ? 'is-active' : '' }}"
