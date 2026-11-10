@@ -24,6 +24,10 @@
         th { padding: 9px 7px; text-align: left; color: #284764; background: #edf3fa; border: 1px solid #dce6f1; }
         td { padding: 8px 7px; vertical-align: top; border: 1px solid #e1e8f0; overflow-wrap: anywhere; }
         tbody tr:nth-child(even) { background: #fafcff; }
+        .analysis-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+        .analysis-grid h2 { margin: 0 0 8px; font-size: 14px; }
+        .analysis-grid table { font-size: 9px; }
+        @media (max-width: 900px) { .analysis-grid { grid-template-columns: 1fr; } }
         .no-results { padding: 24px; text-align: center; color: #64778d; border: 1px solid #dce6f1; }
         .actions { display: flex; justify-content: flex-end; gap: 8px; margin: 0 auto 14px; max-width: 1500px; }
         .actions button { padding: 10px 16px; border: 0; border-radius: 7px; background: #2563d8; color: #fff; font-weight: 700; cursor: pointer; }
@@ -92,6 +96,48 @@
                 @endforeach
             </tbody>
         </table>
+
+        <section class="analysis-grid" aria-label="Análisis complementario">
+            <div>
+                <h2>Tendencia de solicitudes</h2>
+                <table>
+                    <thead><tr><th>Mes</th><th>Solicitudes</th></tr></thead>
+                    <tbody>
+                        @forelse ($analitica['tendencia'] as $mes)
+                            <tr><td>{{ $mes['etiqueta'] }}</td><td>{{ number_format($mes['total']) }}</td></tr>
+                        @empty
+                            <tr><td colspan="2">Sin datos para el periodo.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h2>Solicitudes por categoría</h2>
+                <table>
+                    <thead><tr><th>Categoría</th><th>Total</th></tr></thead>
+                    <tbody>
+                        @forelse ($analitica['categorias'] as $categoria)
+                            <tr><td>{{ $categoria['nombre'] }}</td><td>{{ number_format($categoria['total']) }}</td></tr>
+                        @empty
+                            <tr><td colspan="2">Sin datos disponibles.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h2>Solicitudes por prioridad</h2>
+                <table>
+                    <thead><tr><th>Prioridad</th><th>Total</th></tr></thead>
+                    <tbody>
+                        @forelse ($analitica['prioridades'] as $prioridad)
+                            <tr><td>{{ $prioridad['nombre'] }}</td><td>{{ number_format($prioridad['total']) }}</td></tr>
+                        @empty
+                            <tr><td colspan="2">Sin datos disponibles.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
         <h2>Detalle de solicitudes</h2>
         @if ($tickets->isEmpty())

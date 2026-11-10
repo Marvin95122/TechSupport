@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ReporteAtencionController;
+use App\Http\Controllers\Admin\ReporteAtencionDetalleController;
 use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -49,6 +50,9 @@ Route::middleware(['auth', 'active', 'role:administrador'])
     ->group(function (): void {
         Route::get('/reportes/atencion', [ReporteAtencionController::class, 'index'])
             ->name('reportes.atencion');
+
+        Route::get('/reportes/atencion/tickets/{ticket}', [ReporteAtencionDetalleController::class, 'show'])
+            ->name('reportes.atencion.detalle');
 
         Route::get('/reportes/atencion/imprimir', [ReporteAtencionController::class, 'imprimir'])
             ->name('reportes.atencion.imprimir');

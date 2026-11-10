@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Services\TicketTimelineService;
+use App\Services\ReporteAtencionAnaliticaService;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,11 +32,12 @@ class ReporteAtencionController extends Controller
      * HU-25: presenta un resumen general de las solicitudes de soporte.
      * El acceso se limita al administrador mediante las rutas del módulo.
      */
-    public function index(Request $request): View
+    public function index(Request $request, ReporteAtencionAnaliticaService $analiticaService): View
     {
         $filtros = $this->validarFiltros($request);
         $consulta = $this->construirConsulta($filtros);
         $resumen = $this->construirResumen($consulta);
+        $analitica = $analiticaService->build($filtros);
 
         $tickets = (clone $consulta)
             ->orderByDesc('creado_en')
@@ -57,6 +59,7 @@ class ReporteAtencionController extends Controller
             'tickets',
             'filtros',
             'resumen',
+            'analitica',
             'categorias',
             'prioridades',
             'estados',
@@ -69,11 +72,12 @@ class ReporteAtencionController extends Controller
      * HU-25: genera una versión completa del reporte para imprimir o guardar como PDF.
      * Se consultan todos los resultados que coinciden con los filtros, sin paginación.
      */
-    public function imprimir(Request $request): View
+    public function imprimir(Request $request, ReporteAtencionAnaliticaService $analiticaService): View
     {
         $filtros = $this->validarFiltros($request);
         $consulta = $this->construirConsulta($filtros);
         $resumen = $this->construirResumen($consulta);
+        $analitica = $analiticaService->build($filtros);
 
         $tickets = (clone $consulta)
             ->orderByDesc('creado_en')
@@ -87,6 +91,7 @@ class ReporteAtencionController extends Controller
             'tickets',
             'filtros',
             'resumen',
+            'analitica',
             'periodoTexto',
             'filtrosTexto'
         ));
