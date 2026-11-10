@@ -252,3 +252,32 @@
     .ts-technician-input-group { flex-wrap: nowrap; }
     .ts-technician-input-group .btn { padding-left: .6rem; padding-right: .6rem; }
 }
+
+
+/* Sprint 8 · Reporte general de atención. */
+.ts-report-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 132px;
+    padding: 18px;
+    border: 1px solid #dbe5f0;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(27, 50, 82, .035);
+}
+.ts-report-metric-label { color: #62768e; font-size: .77rem; font-weight: 750; line-height: 1.35; }
+.ts-report-metric strong { color: #1d3959; font-size: 1.85rem; letter-spacing: -.045em; line-height: 1.2; }
+.ts-report-metric .ts-report-metric-duration { font-size: 1.35rem; }
+.ts-report-metric small { color: #7b8da2; font-size: .7rem; margin-top: auto; }
+.ts-report-status { height: 100%; padding: 12px; border: 1px solid #e0e8f2; border-radius: 11px; background: #fbfcfe; }
+.ts-report-status span { display: block; color: #62768e; font-size: .76rem; font-weight: 700; }
+.ts-report-status strong { display: block; margin: 5px 0 9px; color: #1d3959; font-size: 1.35rem; }
+.ts-report-status .progress { height: 6px; background: #e8eef6; }
+.ts-report-status .progress-bar { background: #397bd2; }
+.ts-report-subject { min-width: 170px; max-width: 250px; overflow-wrap: anywhere; }
+@media (max-width: 575.98px) {
+    .ts-report-metric { min-height: 116px; padding: 14px; }
+    .ts-report-metric strong { font-size: 1.55rem; }
+    .ts-report-metric .ts-report-metric-duration { font-size: 1.15rem; }
+}
