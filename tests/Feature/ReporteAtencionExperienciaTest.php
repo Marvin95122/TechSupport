@@ -119,4 +119,38 @@ class ReporteAtencionExperienciaTest extends TestCase
             ->get($ruta)
             ->assertForbidden();
     }
+
+    public function test_administrador_inactivo_no_puede_acceder_a_las_funciones_del_reporte(): void
+    {
+        $solicitante = $this->usuario('solicitante');
+
+        $ticket = $this->ticket(
+            'TS-REPORTE-ADMIN-INACTIVO-001',
+            $solicitante
+        );
+
+        $rutas = [
+            route('admin.reportes.atencion'),
+            route('admin.reportes.atencion.imprimir'),
+            route('admin.reportes.atencion.exportar'),
+            route('admin.reportes.atencion.exportar.excel'),
+            route('admin.reportes.atencion.detalle', [
+                'ticket' => $ticket->id,
+            ]),
+        ];
+
+        foreach ($rutas as $ruta) {
+            $administradorInactivo = User::factory()->create([
+                'role' => 'administrador',
+                'is_active' => false,
+            ]);
+
+            $this->actingAs($administradorInactivo)
+                ->get($ruta)
+                ->assertRedirect(route('login'))
+                ->assertSessionHasErrors('email');
+
+            $this->assertGuest();
+        }
+    }
 }
