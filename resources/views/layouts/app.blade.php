@@ -71,6 +71,12 @@
                             <svg class="ts-icon"><use href="#ts-icon-chart"/></svg>
                             <span class="ts-nav-text">Consultas</span>
                         </a>
+                        <a href="{{ route('admin.reportes.atencion') }}" aria-label="Reportes de atención" title="Reportes"
+                           class="ts-nav-link {{ request()->routeIs('admin.reportes.*') ? 'is-active' : '' }}"
+                           @if(request()->routeIs('admin.reportes.*')) aria-current="page" @endif>
+                            <svg class="ts-icon"><use href="#ts-icon-activity"/></svg>
+                            <span class="ts-nav-text">Reportes</span>
+                        </a>
                         <a href="{{ route('historial.index') }}" aria-label="Historial de atención" title="Historial"
                            class="ts-nav-link {{ request()->routeIs('historial.index') ? 'is-active' : '' }}"
                            @if(request()->routeIs('historial.index')) aria-current="page" @endif>

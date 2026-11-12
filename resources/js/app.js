@@ -5,5 +5,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../css/techsupport.css';
 import '../css/techsupport-contraste.css';
 import '../css/techsupport-modern.css';
+import '../css/techsupport-reports.css';
 import './techsupport-ui.js';
 import './technician-picker.js';

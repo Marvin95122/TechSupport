@@ -83,6 +83,14 @@
                         <a href="{{ route('historial.index') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir historial <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
                     </div>
                 </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="ts-access-card h-100">
+                        <span class="ts-access-icon ts-access-icon--muted" aria-hidden="true"><svg class="ts-icon"><use href="#ts-icon-activity"/></svg></span>
+                        <h3 class="h6 fw-bold">Reporte de atención</h3>
+                        <p class="text-secondary small">Consulta indicadores, filtra solicitudes y genera reportes de atención.</p>
+                        <a href="{{ route('admin.reportes.atencion') }}" class="btn btn-primary btn-sm mt-auto align-self-start">Abrir reportes <svg class="ts-icon ts-icon-inline"><use href="#ts-icon-arrow"/></svg></a>
+                    </div>
+                </div>
             @elseif ($esTecnico)
                 <div class="col-md-6 col-xl-4">
                     <div class="ts-access-card h-100">

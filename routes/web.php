@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ReporteAtencionController;
+use App\Http\Controllers\Admin\ReporteAtencionDetalleController;
 use App\Http\Controllers\Admin\TicketAsignacionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -41,6 +43,28 @@ Route::middleware(['auth', 'active'])->group(function (): void {
             Route::patch('/usuarios/{user}/estado', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
         });
 });
+
+// Sprint 8 / HU-25: reporte general de atención, exclusivo del administrador.
+Route::middleware(['auth', 'active', 'role:administrador'])
+    ->prefix('admin')->name('admin.')
+    ->group(function (): void {
+        Route::get('/reportes/atencion', [ReporteAtencionController::class, 'index'])
+            ->name('reportes.atencion');
+
+        Route::get('/reportes/atencion/tickets/{ticket}', [ReporteAtencionDetalleController::class, 'show'])
+            ->name('reportes.atencion.detalle');
+
+        Route::get('/reportes/atencion/imprimir', [ReporteAtencionController::class, 'imprimir'])
+            ->name('reportes.atencion.imprimir');
+
+        Route::get('/reportes/atencion/exportar', [ReporteAtencionController::class, 'exportar'])
+            ->middleware('throttle:30,1')
+            ->name('reportes.atencion.exportar');
+
+        Route::get('/reportes/atencion/exportar/excel', [ReporteAtencionController::class, 'exportarExcel'])
+            ->middleware('throttle:15,1')
+            ->name('reportes.atencion.exportar.excel');
+    });
 
 // Sprint 3: registro y administración de equipos.
 Route::middleware(['auth', 'active', 'role:administrador'])
