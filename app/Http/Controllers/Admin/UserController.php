@@ -54,8 +54,12 @@ class UserController extends Controller
                 'string',
                 'min:12',
                 'confirmed',
+
             ],
+        ], [
+            'email.unique' => 'El correo electrónico ya está registrado.',
         ]);
+
 
         $user = new User();
         $user->name = $validated['name'];
@@ -94,8 +98,12 @@ class UserController extends Controller
                 'string',
                 'min:12',
                 'confirmed',
+
             ],
+        ], [
+            'email.unique' => 'El correo electrónico ya está registrado.',
         ]);
+
 
         if (
             $user->id === $request->user()->id

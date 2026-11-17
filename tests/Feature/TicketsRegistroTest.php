@@ -142,4 +142,29 @@ class TicketsRegistroTest extends TestCase
         $this->assertNotSame('FOLIO-FALSIFICADO', $ticket->folio);
         $this->assertNull($ticket->tecnico_id);
     }
+
+
+public function test_fecha_registro_usa_reloj_de_laravel(): void
+{
+    $this->travelTo(
+        \Illuminate\Support\Carbon::parse(
+            '2026-11-17 12:34:56',
+            'UTC'
+        )
+    );
+
+    $this->actingAs($this->solicitante())
+        ->post(route('tickets.store'), $this->datos())
+        ->assertRedirect(route('tickets.create'));
+
+    $ticket = Ticket::firstOrFail();
+
+    $this->assertSame(
+        '2026-11-17 12:34:56',
+        $ticket->creado_en->format('Y-m-d H:i:s')
+    );
+
+    $this->travelBack();
+}
+
 }
