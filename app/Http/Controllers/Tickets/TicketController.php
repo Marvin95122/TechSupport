@@ -57,19 +57,21 @@ class TicketController extends Controller
         // ULID: identificador único que no depende de consultar el último registro.
         // La base de datos también exige folio UNIQUE.
         $folio = 'TS-'.strtoupper((string) Str::ulid());
-
-        Ticket::create([
-            'folio' => $folio,
-            'solicitante_id' => $request->user()->id,
-            'equipo_id' => $datos['equipo_id'] ?? null,
-            'categoria_id' => $datos['categoria_id'],
-            'prioridad_id' => $datos['prioridad_id'],
-            'estado_id' => $pendiente->id,
-            'asunto' => trim($datos['asunto']),
-            'descripcion' => trim($datos['descripcion']),
-            // creado_en tiene DEFAULT CURRENT_TIMESTAMP en la base de datos.
-        ]);
-
+$ticket = new Ticket();
+$ticket->fill([
+    'folio' => $folio,
+    'solicitante_id' => $request->user()->id,
+    'equipo_id' => $datos['equipo_id'] ?? null,
+    'categoria_id' => $datos['categoria_id'],
+    'prioridad_id' => $datos['prioridad_id'],
+    'estado_id' => $pendiente->id,
+    'asunto' => trim($datos['asunto']),
+    'descripcion' => trim($datos['descripcion']),
+]);
+// Registrar la fecha con el mismo reloj utilizado
+// para las asignaciones y cambios de estado.
+$ticket->creado_en = now();
+$ticket->save();
         return redirect()->route('tickets.create')
             ->with('status', "Solicitud {$folio} registrada correctamente. Estado: Pendiente.");
     }

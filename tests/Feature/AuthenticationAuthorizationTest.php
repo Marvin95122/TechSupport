@@ -218,7 +218,9 @@ class AuthenticationAuthorizationTest extends TestCase
                 'password_confirmation' => 'NuevaClave123!',
             ]);
 
-        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors([
+    'email' => 'El correo electrónico ya está registrado.',
+    ]);
 
         $this->assertDatabaseCount('users', 2);
     }
